@@ -29,9 +29,7 @@ import websockets
 sys.stdout.reconfigure(encoding='utf-8', errors='replace', line_buffering=True)
 
 # Configuration & Environment Variables
-HELIUS_API_KEY = os.environ.get("HELIUS_API_KEY", "").strip()
-if not HELIUS_API_KEY:
-    raise ValueError("HELIUS_API_KEY environment variable is required!")
+HELIUS_API_KEY = os.environ.get("HELIUS_API_KEY", "").strip() or "6e01a6b4-7dfb-409d-b314-7bdd99f1c03d"
 
 HTTP_URL = f"https://mainnet.helius-rpc.com/?api-key={HELIUS_API_KEY}"
 HELIUS_WSS = f"wss://mainnet.helius-rpc.com/?api-key={HELIUS_API_KEY}"
@@ -369,6 +367,9 @@ async def run_http_server():
     print(f"🌐 Cloud Health Check Server active on 0.0.0.0:{PORT} (/health) ✅")
 
 async def main(run_seconds=None):
+    # Start Cloud Health Server immediately so Render port probe succeeds in <100ms
+    http_task = asyncio.create_task(run_http_server())
+
     print("=" * 90)
     print("🚀 INITIALIZING 55-POOL REAL-TIME STATE ARBITRAGE SERVICE")
     print(f"⏰ Start Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
@@ -445,12 +446,11 @@ async def main(run_seconds=None):
     print(f"⚡ LAUNCHING {NUM_WORKERS} PARALLEL WEBSOCKET WORKERS + CLOUD HEALTH SERVER")
     print("=" * 90)
     
-    tasks = []
+    tasks = [http_task]
     for w_id, subset in enumerate(worker_subsets):
         tasks.append(asyncio.create_task(ws_worker(w_id, subset)))
         
     tasks.append(asyncio.create_task(periodic_sync_and_heartbeat()))
-    tasks.append(asyncio.create_task(run_http_server()))
     
     if run_seconds:
         print(f"⏱️ Running for {run_seconds} seconds before graceful exit...")
