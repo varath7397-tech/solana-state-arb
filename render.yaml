@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: solana-state-arb
+    runtime: python
+    region: frankfurt            # Ultra low latency to Jito Frankfurt Block Engine (<5ms)
+    plan: free
+    numInstances: 1
+    branch: main
+    autoDeployTrigger: commit
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -u main.py
+    healthCheckPath: /health
+    envVars:
+      - key: HELIUS_API_KEY
+        value: 6e01a6b4-7dfb-409d-b314-7bdd99f1c03d
+      - key: PORT
+        value: "10000"
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: TZ
+        value: Asia/Kolkata

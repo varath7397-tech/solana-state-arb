@@ -1,0 +1,15 @@
+# Solana State Arb - Git Ignore
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+.env
+.env.*
+*.log
+*.jsonl
+engine_status.json
+live_keypair.json
+*keypair*
+*secret*
