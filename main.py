@@ -28,8 +28,11 @@ import websockets
 # Force UTF-8 encoding on Windows
 sys.stdout.reconfigure(encoding='utf-8', errors='replace', line_buffering=True)
 
-# Configuration & Secrets
-HELIUS_API_KEY = os.environ.get("HELIUS_API_KEY", "6e01a6b4-7dfb-409d-b314-7bdd99f1c03d").strip()
+# Configuration & Environment Variables
+HELIUS_API_KEY = os.environ.get("HELIUS_API_KEY", "").strip()
+if not HELIUS_API_KEY:
+    raise ValueError("HELIUS_API_KEY environment variable is required!")
+
 HTTP_URL = f"https://mainnet.helius-rpc.com/?api-key={HELIUS_API_KEY}"
 HELIUS_WSS = f"wss://mainnet.helius-rpc.com/?api-key={HELIUS_API_KEY}"
 
